@@ -33,3 +33,13 @@ The actual code i am trying to write will use the Basic to switch a Fan.
 I will add 2 DHT22 in a case like this https://www.thingiverse.com/thing:4852992
 
 The sketch will simply compare temeratures and switch the relay on/off
+
+### Development
+
+Turns out the Sonoff Basic has very very little free pins. Maybe just one.
+
+So to use it we will have to use rx/tx for the sensors, which does make Development
+difficult (no Serial). So i will develop on a D1 Mini that is also a 8266.
+
+OTA is already working and so once debugging is done it "should" just be upload.
+But i'll make a backdoor to dump serial links to the web interface that i am planning anyway.
