@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "ota.hpp"
+#include "server.hpp"
 
 // DHT Temperature & Humidity Sensor
 // Unified Sensor Library Example
@@ -25,9 +26,11 @@ uint32_t delayMS = 3000 ;
 
 const char* ssid = "fan_XXX";
 
+
 void setup() {
   Serial.begin(115200);
   ota_setup(ssid);
+  server_setup();
   Serial.println(WiFi.softAPIP());
 
 
