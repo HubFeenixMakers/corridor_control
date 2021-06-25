@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My first Chartist Tests</title>
+    <link rel="stylesheet" href="chartist.min.css.gz">
+    <style>
+        .ct-chart{
+            width: 90%;
+            height: 300px;
+        }
+    </style>
+</head>
+  <body>
+    <h1> Weekly </h1>
+    <div class="ct-chart chart1"></div>
+    <h1> Monthly </h1>
+    <div class="ct-chart chart2"></div>
+    <script >
+        function draw_chart(){
+            var data = {
+            // Our series array that contains series objects or in this case series data arrays
+            series: [
+            [5, 2, 4, 2, 0]
+            ]
+        };
+        weekly = new Chartist.Line('.chart1', data);
+        monthly = new Chartist.Line('.chart2', data);
+	};
+
+    </script>
+    <script  onload="draw_chart();" src="./chartist.min.js.gz"> </script>
+
+</body>
+</html>

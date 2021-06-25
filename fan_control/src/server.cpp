@@ -25,7 +25,7 @@ String getContentType(String filename){
 
 bool handleFileRead(String path ){
   DBG_OUTPUT_PORT.println("handleFileRead: " + path);
-  if(path.endsWith("/")) path += "index.htm";
+  if(path.endsWith("/")) path += "index.html";
   String contentType = getContentType(path);
   String pathWithGz = path + ".gz";
   if(LittleFS.exists(pathWithGz) || LittleFS.exists(path)){
