@@ -1,7 +1,7 @@
 #include "ota.hpp"
 
 void ota_setup(const char* ssid) {
-  Serial.begin(115200);
+
   Serial.println("Booting");
   boolean result = WiFi.softAP(ssid);
   while (result == false) {
@@ -49,8 +49,4 @@ void ota_setup(const char* ssid) {
     else if (error == OTA_END_ERROR) Serial.println("End Failed");
   });
   ArduinoOTA.begin();
-  Serial.println("Ready");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
 }

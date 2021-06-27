@@ -7,31 +7,33 @@ ESP8266WebServer* serv  = NULL;
 
 
 String getContentType(String filename){
-  if(filename.endsWith(".htm")) return "text/html";
-  else if(filename.endsWith(".html")) return "text/html";
-  else if(filename.endsWith(".css")) return "text/css";
-  else if(filename.endsWith(".js")) return "application/javascript";
-  else if(filename.endsWith(".png")) return "image/png";
-  else if(filename.endsWith(".gif")) return "image/gif";
-  else if(filename.endsWith(".jpg")) return "image/jpeg";
-  else if(filename.endsWith(".ico")) return "image/x-icon";
-  else if(filename.endsWith(".xml")) return "text/xml";
-  else if(filename.endsWith(".pdf")) return "application/x-pdf";
-  else if(filename.endsWith(".zip")) return "application/x-zip";
-  else if(filename.endsWith(".gz")) return "application/x-gzip";
+  if(filename.indexOf(".htm") > 0) return "text/html";
+  else if(filename.indexOf(".html")> 0) return "text/html";
+  else if(filename.indexOf(".css")> 0) return "text/css";
+  else if(filename.indexOf(".js")> 0) return "application/javascript";
+  else if(filename.indexOf(".png")> 0) return "image/png";
+  else if(filename.indexOf(".gif")> 0) return "image/gif";
+  else if(filename.indexOf(".jpg")> 0) return "image/jpeg";
+  else if(filename.indexOf(".ico")> 0) return "image/x-icon";
+  else if(filename.indexOf(".xml")> 0) return "text/xml";
+  else if(filename.indexOf(".pdf")> 0) return "application/x-pdf";
   return "text/plain";
 }
-
 
 bool handleFileRead(String path ){
   DBG_OUTPUT_PORT.println("handleFileRead: " + path);
   if(path.endsWith("/")) path += "index.html";
-  String contentType = getContentType(path);
-  String pathWithGz = path + ".gz";
-  if(LittleFS.exists(pathWithGz) || LittleFS.exists(path)){
-    if(LittleFS.exists(pathWithGz))
-      path += ".gz";
+  String contentType = getContentType(path) + ";charset=utf-8";
+  if(LittleFS.exists(path)){
+    DBG_OUTPUT_PORT.println("handle: " + path);
     File file = LittleFS.open(path, "r");
+    if(path.endsWith(".gz")){
+      DBG_OUTPUT_PORT.println("sETTING GZIP" );
+      //server.sendHeader("Content-Encoding" , "gzip");
+    } else {
+      contentType += ";charset=utf-8";
+    }
+    server.streamFile(file, contentType);
     file.close();
     return true;
   }
@@ -42,11 +44,44 @@ void handleHours(){
 
 }
 
+int LDRPin = A0;
+int LDRReading = 0; 
+
+int milisInterval = 2000;
+int count = 0;
+
+void getData() {   
+   //This is a JSON formatted string that will be served. You can change the values to whatever like.
+   // {"data":[{"dataValue":"1024"},{"dataValue":"23"}]} This is essentially what is will output you can add more if you like
+	Serial.println("Data start");
+  LDRReading = analogRead(LDRPin);
+  String text2 = "{\"data\":[";
+  text2 += "{\"dataValue\":\"";
+  text2 += "LDRReading";
+  text2 += "\"},";
+  text2 += "{\"dataValue\":\"";
+  text2 += "count";
+  text2 += "\"}";
+  text2 += "]}";
+	Serial.println("Data end");
+  server.send(200, "text/html", text2);
+  count++;
+}
+
 void server_setup(){
-    LittleFS.begin();
-    server.on("/hour", HTTP_GET, handleHours);
-    server.onNotFound([](){
-        if(!handleFileRead(server.uri()))
-            server.send(404, "text/plain", "FileNotFound");
-    });
+  LittleFS.begin();
+  server.on("/data", getData);
+  server.on("/hour", handleHours);
+
+	server.begin();
+	Serial.println("HTTP server started");
+
+  server.onNotFound([](){
+      if(!handleFileRead(server.uri()))
+          server.send(404, "text/plain", "FileNotFound");
+  });
+}
+
+void server_loop() {
+	server.handleClient();
 }

@@ -2,6 +2,7 @@
 
 #include "ota.hpp"
 #include "server.hpp"
+#include "collector.hpp"
 
 // DHT Temperature & Humidity Sensor
 // Unified Sensor Library Example
@@ -31,20 +32,20 @@ void setup() {
   Serial.begin(115200);
   ota_setup(ssid);
   server_setup();
-  Serial.println(WiFi.softAPIP());
-
-
   // Initialize device.
   dht_in.begin();
   dht_out.begin();
-  Serial.println(F("DHT set up"));
+  Serial.println(F("Setup done"));
+  Serial.print("IP address: ");
+  Serial.println(WiFi.softAPIP());
 }
 
 void loop() {
   ArduinoOTA.handle();
+	server_loop();
 
   // Delay between measurements.
-  delay(delayMS);
+  delay(1000);
 
   // Get temperature event and print its value.
   Serial.print(F("Temperature inside: "));
