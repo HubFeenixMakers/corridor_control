@@ -3,8 +3,6 @@
 
 #define DBG_OUTPUT_PORT Serial
 
-ESP8266WebServer* serv  = NULL;
-
 
 String getContentType(String filename){
   if(filename.indexOf(".htm") > 0) return "text/html";
@@ -28,7 +26,6 @@ bool handleFileRead(String path ){
     DBG_OUTPUT_PORT.println("handle: " + path);
     File file = LittleFS.open(path, "r");
     if(path.endsWith(".gz")){
-      DBG_OUTPUT_PORT.println("sETTING GZIP" );
       //server.sendHeader("Content-Encoding" , "gzip");
     } else {
       contentType += ";charset=utf-8";
