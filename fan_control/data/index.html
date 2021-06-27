@@ -10,25 +10,28 @@
         }
     </style>
 </head>
-  <body>
-    <h1> Weekly </h1>
-    <div class="ct-chart chart1"></div>
-    <h1> Monthly </h1>
-    <div class="ct-chart chart2"></div>
-    <script >
-        function draw_chart(){
-            var data = {
-            // Our series array that contains series objects or in this case series data arrays
-            series: [
-            [5, 2, 4, 2, 0]
-            ]
-        };
-        weekly = new Chartist.Line('.chart1', data);
-        monthly = new Chartist.Line('.chart2', data);
-	};
-
-    </script>
-    <script  onload="draw_chart();" src="./chartist.min.js.gz"> </script>
+<body>
+  <h1> Weekly </h1>
+  <div class="ct-chart chart1"></div>
+  <h1> Monthly </h1>
+  <div class="ct-chart chart2"></div>
+  <script >
+    function load_charts(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log(this.responseText);
+          var series = [5, 2, 4, 2, 0] ; // JSON.parse(this.responseText);
+          var data = { series: [ series ]  };
+          new Chartist.Line('.chart1', data);
+        }
+      }
+      xhttp.open("GET", "/data", true);
+      xhttp.send();
+    };
+    //monthly = new Chartist.Line('.chart2', data);
+  </script>
+  <script  onload="load_charts();" src="/chartist.min.js.gz"> </script>
 
 </body>
 </html>
