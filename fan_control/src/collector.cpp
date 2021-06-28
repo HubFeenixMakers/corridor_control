@@ -26,11 +26,13 @@ void collector_setup(){
   // Initialize device.
   dht_in.begin();
   dht_out.begin();
+  for( int a = 0; a < 4* WEEK*collector.bucket ; a = a + 1 ) {
+    collector.add( random(10, 30) , random(10 , 30)  );
+  }
 }
 
 void collector_loop(){
   delay(delayMS);
-  collector.add(1 , 2);
 
   // Get temperature event and print its value.
   Serial.print(F("Temperature inside: "));
@@ -41,18 +43,48 @@ void collector_loop(){
   Serial.println("°C");
 }
 
-  void Collector::add(float in , float out)
-  {
-    minute += in;
-    counter++ ;
-    if(counter % bucket){
-      int at_week = counter / bucket; 
-      week_in[at_week] = minute / bucket;
-      minute = 0;
-    }
-    if(counter % (bucket*bucket)){
-      int at_week = counter / bucket; 
-      month_in[at_week] = minute / bucket;
-    counter = 0;
-    }
+void Collector::add(float in , float out)
+{
+  minute += in;
+  counter++ ;
+  if(counter % bucket){
+    int at_week = counter / bucket; 
+    week_in[at_week] = minute / bucket;
+    minute = 0;
   }
+  if(counter % (bucket*bucket)){
+    int at_week = counter / bucket; 
+    month_in[at_week] = minute / bucket;
+  counter = 0;
+  }
+}
+
+String Collector::one_week(float week[]){
+  String data = "[";
+  data += week[0];
+  for( int a = 1; a < WEEK ; a = a + 1 ) {
+    data += "," ; 
+    data += week[a] ;
+  }
+  return data + "]";
+}
+
+String Collector::week_data(){
+  String data = "[";
+  return data + one_week(week_in) + "," + one_week(week_out) + "]";
+}
+
+String Collector::one_month(float month[]){
+  String data = "[";
+  data += month[0];
+  for( int a = 1; a < MONTH ; a = a + 1 ) {
+    data += "," ; 
+    data += month[a] ;
+  }
+  return data + "]";
+}
+
+String Collector::month_data(){
+  String data = "[";
+  return data + one_month(month_in) + "," + one_month(month_out) + "]";
+}

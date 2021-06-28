@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "collector.hpp"
 #include <FS.h>
 
 #define DBG_OUTPUT_PORT Serial
@@ -37,38 +38,23 @@ bool handleFileRead(String path ){
   return false;
 }
 
-void handleHours(){
-
+void getWeekly() {
+	Serial.println("Weekly start");
+  String data = collector.week_data();
+	Serial.println("Weekly end");
+  server.send(200, "text/html", data);
 }
-
-int LDRPin = A0;
-int LDRReading = 0; 
-
-int milisInterval = 2000;
-int count = 0;
-
-void getData() {   
-   //This is a JSON formatted string that will be served. You can change the values to whatever like.
-   // {"data":[{"dataValue":"1024"},{"dataValue":"23"}]} This is essentially what is will output you can add more if you like
-	Serial.println("Data start");
-  LDRReading = analogRead(LDRPin);
-  String text2 = "{\"data\":[";
-  text2 += "{\"dataValue\":\"";
-  text2 += "LDRReading";
-  text2 += "\"},";
-  text2 += "{\"dataValue\":\"";
-  text2 += "count";
-  text2 += "\"}";
-  text2 += "]}";
-	Serial.println("Data end");
-  server.send(200, "text/html", text2);
-  count++;
+void getMonthly() {
+	Serial.println("Monthly start");
+  String data = collector.month_data();
+	Serial.println("Monthly end");
+  server.send(200, "text/html", data);
 }
 
 void server_setup(){
   LittleFS.begin();
-  server.on("/data", getData);
-  server.on("/hour", handleHours);
+  server.on("/weekly", getWeekly);
+  server.on("/monthly", getMonthly);
 
 	server.begin();
 	Serial.println("HTTP server started");

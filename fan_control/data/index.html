@@ -16,20 +16,24 @@
   <h1> Monthly </h1>
   <div class="ct-chart chart2"></div>
   <script >
-    function load_charts(){
+
+    function load_chart( url , clazz ){
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
           console.log(this.responseText);
-          var series = [5, 2, 4, 2, 0] ; // JSON.parse(this.responseText);
-          var data = { series: [ series ]  };
-          new Chartist.Line('.chart1', data);
+          var series = JSON.parse(this.responseText);
+          var data = { series: series   };
+          new Chartist.Line(clazz, data);
         }
       }
-      xhttp.open("GET", "/data", true);
+      xhttp.open("GET", url, true);
       xhttp.send();
     };
-    //monthly = new Chartist.Line('.chart2', data);
+    function load_charts(){
+      load_chart("/weekly" , ".chart1");
+      load_chart("/monthly" , ".chart2");
+    }
   </script>
   <script  onload="load_charts();" src="/chartist.min.js.gz"> </script>
 
