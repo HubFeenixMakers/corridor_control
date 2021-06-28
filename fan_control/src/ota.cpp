@@ -1,15 +1,16 @@
 #include "ota.hpp"
+#include "serial.hpp"
 
 void ota_setup(const char* ssid) {
 
-  Serial.println("Booting");
+  DEBUG_OUT.println("Booting");
   boolean result = WiFi.softAP(ssid);
   while (result == false) {
-    Serial.println("Connection Failed! Rebooting...");
+    DEBUG_OUT.println("Connection Failed! Rebooting...");
     delay(5000);
     ESP.restart();
   }
-  Serial.println(WiFi.softAPIP());
+  DEBUG_OUT.println(WiFi.softAPIP());
 
   // Port defaults to 3232
   //  ArduinoOTA.setPort(8266);
@@ -32,21 +33,21 @@ void ota_setup(const char* ssid) {
       type = "filesystem";
 
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-    Serial.println("Start updating " + type);
+    DEBUG_OUT.println("Start updating " + type);
   });
   ArduinoOTA.onEnd([]() {
-    Serial.println("\nEnd");
+    DEBUG_OUT.println("\nEnd");
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    DEBUG_OUT.printf("Progress: %u%%\r", (progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    DEBUG_OUT.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) DEBUG_OUT.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) DEBUG_OUT.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) DEBUG_OUT.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) DEBUG_OUT.println("Receive Failed");
+    else if (error == OTA_END_ERROR) DEBUG_OUT.println("End Failed");
   });
   ArduinoOTA.begin();
 }

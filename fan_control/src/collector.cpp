@@ -1,4 +1,5 @@
 #include "collector.hpp"
+#include "serial.hpp"
 
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
@@ -33,14 +34,14 @@ void collector_setup(){
 
 void collector_loop(){
   delay(delayMS);
-
   // Get temperature event and print its value.
-  Serial.print(F("Temperature inside: "));
-  Serial.print(dht_in.readTemperature());
-  Serial.println(F("°C"));
-  Serial.print(F("Temperature outside: "));
-  Serial.print(dht_out.readTemperature());
-  Serial.println("°C");
+  float in = dht_in.readTemperature();
+  float out = dht_out.readTemperature();
+  DEBUG_OUT.print(F("Temperature inside:  "));
+  DEBUG_OUT.println(in);
+  DEBUG_OUT.print(F("Temperature outside: "));
+  DEBUG_OUT.println(out);
+  collector.add(in , out);
 }
 
 void Collector::add(float in , float out)
@@ -48,12 +49,12 @@ void Collector::add(float in , float out)
   minute += in;
   counter++ ;
   if(counter % bucket){
-    int at_week = counter / bucket; 
+    int at_week = counter / bucket;
     week_in[at_week] = minute / bucket;
     minute = 0;
   }
   if(counter % (bucket*bucket)){
-    int at_week = counter / bucket; 
+    int at_week = counter / bucket;
     month_in[at_week] = minute / bucket;
   counter = 0;
   }
@@ -63,7 +64,7 @@ String Collector::one_week(float week[]){
   String data = "[";
   data += week[0];
   for( int a = 1; a < WEEK ; a = a + 1 ) {
-    data += "," ; 
+    data += "," ;
     data += week[a] ;
   }
   return data + "]";
@@ -78,7 +79,7 @@ String Collector::one_month(float month[]){
   String data = "[";
   data += month[0];
   for( int a = 1; a < MONTH ; a = a + 1 ) {
-    data += "," ; 
+    data += "," ;
     data += month[a] ;
   }
   return data + "]";

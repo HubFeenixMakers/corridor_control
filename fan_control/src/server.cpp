@@ -1,8 +1,8 @@
 #include "server.hpp"
 #include "collector.hpp"
-#include <FS.h>
+#include "serial.hpp"
 
-#define DBG_OUTPUT_PORT Serial
+#include <FS.h>
 
 
 String getContentType(String filename){
@@ -20,11 +20,11 @@ String getContentType(String filename){
 }
 
 bool handleFileRead(String path ){
-  DBG_OUTPUT_PORT.println("handleFileRead: " + path);
+  DEBUG_OUT.println("handleFileRead: " + path);
   if(path.endsWith("/")) path += "index.html";
   String contentType = getContentType(path) + ";charset=utf-8";
   if(LittleFS.exists(path)){
-    DBG_OUTPUT_PORT.println("handle: " + path);
+    DEBUG_OUT.println("handle: " + path);
     File file = LittleFS.open(path, "r");
     if(path.endsWith(".gz")){
       //server.sendHeader("Content-Encoding" , "gzip");
@@ -39,15 +39,15 @@ bool handleFileRead(String path ){
 }
 
 void getWeekly() {
-	Serial.println("Weekly start");
+	DEBUG_OUT.println("Weekly start");
   String data = collector.week_data();
-	Serial.println("Weekly end");
+	DEBUG_OUT.println("Weekly end");
   server.send(200, "text/html", data);
 }
 void getMonthly() {
-	Serial.println("Monthly start");
+	DEBUG_OUT.println("Monthly start");
   String data = collector.month_data();
-	Serial.println("Monthly end");
+	DEBUG_OUT.println("Monthly end");
   server.send(200, "text/html", data);
 }
 
@@ -57,7 +57,7 @@ void server_setup(){
   server.on("/monthly", getMonthly);
 
 	server.begin();
-	Serial.println("HTTP server started");
+	DEBUG_OUT.println("HTTP server started");
 
   server.onNotFound([](){
       if(!handleFileRead(server.uri()))
