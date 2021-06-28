@@ -4,6 +4,7 @@
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
+
 // DHT Temperature & Humidity Sensor
 // Unified Sensor Library Example
 // Written by Tony DiCola for Adafruit Industries
@@ -12,9 +13,6 @@
 // REQUIRES the following Arduino libraries:
 // - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
 // - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
-
-// Set delay between sensor readings based on sensor details.
-uint32_t delayMS = 3000 ;
 
 
 // mini https://chewett.co.uk/blog/1066/pin-numbering-for-wemos-d1-mini-esp8266/
@@ -27,13 +25,17 @@ void collector_setup(){
   // Initialize device.
   dht_in.begin();
   dht_out.begin();
-  for( int a = 0; a < 4* WEEK*collector.bucket ; a = a + 1 ) {
-    collector.add( random(10, 30) , random(10 , 30)  );
+  float last_in = 20;
+  float last_out = 20;
+  for( int a = 0; a < PER_HOUR*WEEK ; a += 1 ) {
+    collector.add_week( last_in , last_out  );
+    last_in += random(-30 , 30) / 100.0 ;
+    last_out += random(-30 , 30) / 100.0 ;
   }
 }
 
 void collector_loop(){
-  delay(delayMS);
+  delay(DELAY);
   // Get temperature event and print its value.
   float in = dht_in.readTemperature();
   float out = dht_out.readTemperature();
@@ -41,51 +43,87 @@ void collector_loop(){
   DEBUG_OUT.println(in);
   DEBUG_OUT.print(F("Temperature outside: "));
   DEBUG_OUT.println(out);
-  collector.add(in , out);
+  //collector.add(in , out);
 }
 
 void Collector::add(float in , float out)
 {
-  minute += in;
-  counter++ ;
-  if(counter % bucket){
-    int at_week = counter / bucket;
-    week_in[at_week] = minute / bucket;
-    minute = 0;
+  minute_in += in;
+  minute_out += out;
+  minute_counter++ ;
+  if(minute_counter >= MINUTE) {
+    add_week(minute_in/MINUTE , minute_out / MINUTE);
+    minute_in = 0;
+    minute_out = 0;
+    minute_counter = 0;
   }
-  if(counter % (bucket*bucket)){
-    int at_week = counter / bucket;
-    month_in[at_week] = minute / bucket;
-  counter = 0;
+}
+
+void Collector::add_week(float in , float out){
+  week_in[week_counter] = in;
+  week_out[week_counter] = out;
+  if((week_counter % PER_HOUR) == 0){
+    add_month( week_counter - PER_HOUR);
+  }
+  week_counter++ ;
+  if(week_counter >= WEEK) {
+    week_counter = 0;
+  }
+}
+
+void Collector::add_month(int from){
+  if( from < 0) return;
+  if( from + PER_HOUR > WEEK) return ;
+  float month_i = 0;
+  float  month_o = 0;
+  for(int i = 0 ; i < PER_HOUR ; i++){
+    month_i += week_in[ from + i];
+    month_o += week_out[ from + i];
+  }
+  month_in[month_counter] = month_i / PER_HOUR;
+  month_out[month_counter] = month_o / PER_HOUR ;
+  month_counter++ ;
+  if(month_counter >= MONTH) {
+    month_counter = 0;
   }
 }
 
 String Collector::one_week(float week[]){
   String data = "[";
-  data += week[0];
-  for( int a = 1; a < WEEK ; a = a + 1 ) {
+  data += String(week[0] , 2) ;
+  for( int a = 1; a < WEEK ; a += 1 ) {
     data += "," ;
-    data += week[a] ;
+    data += String(week[a] , 2) ;
   }
-  return data + "]";
+  data += "]";
+  return data ;
 }
 
 String Collector::week_data(){
   String data = "[";
-  return data + one_week(week_in) + "," + one_week(week_out) + "]";
+  data += one_week(week_in) ;
+  data += "," ;
+  data += one_week(week_out) ;
+  data += "]";
+  return data;
 }
 
 String Collector::one_month(float month[]){
   String data = "[";
-  data += month[0];
-  for( int a = 1; a < MONTH ; a = a + 1 ) {
+  data += String(month[0] , 2);
+  for( int a = 1; a < MONTH ; a += 1 ) {
     data += "," ;
-    data += month[a] ;
+    data += String(month[a], 2) ;
   }
-  return data + "]";
+  data += "]";
+  return data ;
 }
 
 String Collector::month_data(){
   String data = "[";
-  return data + one_month(month_in) + "," + one_month(month_out) + "]";
+  data += one_month(month_in) ;
+  data += "," ;
+  data += one_month(month_out) ;
+  data += "]";
+  return data ;
 }

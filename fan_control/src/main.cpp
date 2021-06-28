@@ -12,6 +12,7 @@ void setup() {
   DEBUG_OUT.begin(115200);
   ota_setup(ssid);
   server_setup();
+  collector_setup();
   DEBUG_OUT.println(F("Setup done"));
   DEBUG_OUT.print("IP address: ");
   DEBUG_OUT.println(WiFi.softAPIP());
