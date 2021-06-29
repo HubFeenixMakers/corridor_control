@@ -1,7 +1,8 @@
-#include <ESP8266WebServer.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
 
-static ESP8266WebServer server(80);
+static AsyncWebServer server(80);
 
 void server_setup();
 void server_loop();

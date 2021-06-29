@@ -21,6 +21,13 @@ DHT dht_out(5, DHT11); // D1 on mini
 
 Collector collector;
 
+float next_rand( float old ){
+  float f =  old + random(-30 , 30) / 100.0 ;
+  if( f > 30.0) f = 30.0 ;
+  if( f < -20.0) f = -20.0 ;
+  return f;
+}
+
 void collector_setup(){
   // Initialize device.
   dht_in.begin();
@@ -29,8 +36,8 @@ void collector_setup(){
   float last_out = 20;
   for( int a = 0; a < PER_HOUR*WEEK ; a += 1 ) {
     collector.add_week( last_in , last_out  );
-    last_in += random(-30 , 30) / 100.0 ;
-    last_out += random(-30 , 30) / 100.0 ;
+    last_in = next_rand(last_in);
+    last_out = next_rand(last_out);
   }
 }
 
@@ -43,11 +50,13 @@ void collector_loop(){
   DEBUG_OUT.println(in);
   DEBUG_OUT.print(F("Temperature outside: "));
   DEBUG_OUT.println(out);
-  //collector.add(in , out);
+  collector.add(in , out);
 }
 
 void Collector::add(float in , float out)
 {
+  if(isnan(in) ) return ;  
+  if(isnan(out) ) return ;  
   minute_in += in;
   minute_out += out;
   minute_counter++ ;
@@ -88,42 +97,3 @@ void Collector::add_month(int from){
   }
 }
 
-String Collector::one_week(float week[]){
-  String data = "[";
-  data += String(week[0] , 2) ;
-  for( int a = 1; a < WEEK ; a += 1 ) {
-    data += "," ;
-    data += String(week[a] , 2) ;
-  }
-  data += "]";
-  return data ;
-}
-
-String Collector::week_data(){
-  String data = "[";
-  data += one_week(week_in) ;
-  data += "," ;
-  data += one_week(week_out) ;
-  data += "]";
-  return data;
-}
-
-String Collector::one_month(float month[]){
-  String data = "[";
-  data += String(month[0] , 2);
-  for( int a = 1; a < MONTH ; a += 1 ) {
-    data += "," ;
-    data += String(month[a], 2) ;
-  }
-  data += "]";
-  return data ;
-}
-
-String Collector::month_data(){
-  String data = "[";
-  data += one_month(month_in) ;
-  data += "," ;
-  data += one_month(month_out) ;
-  data += "]";
-  return data ;
-}

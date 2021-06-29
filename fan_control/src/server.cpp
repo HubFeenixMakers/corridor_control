@@ -2,8 +2,12 @@
 #include "collector.hpp"
 #include "serial.hpp"
 
+#include "AsyncJson.h"
+#include "ArduinoJson.h"
+
 #include <FS.h>
 
+#define DEBUG_OUT Serial
 
 String getContentType(String filename){
   if(filename.indexOf(".htm") > 0) return "text/html";
@@ -19,52 +23,59 @@ String getContentType(String filename){
   return "text/plain";
 }
 
-bool handleFileRead(String path ){
-  DEBUG_OUT.println("handleFileRead: " + path);
-  if(path.endsWith("/")) path += "index.html";
-  String contentType = getContentType(path) + ";charset=utf-8";
-  if(LittleFS.exists(path)){
-    DEBUG_OUT.println("handle: " + path);
-    File file = LittleFS.open(path, "r");
-    if(path.endsWith(".gz")){
-      //server.sendHeader("Content-Encoding" , "gzip");
-    } else {
-      contentType += ";charset=utf-8";
-    }
-    server.streamFile(file, contentType);
-    file.close();
-    return true;
-  }
-  return false;
-}
 
-void getWeekly() {
-	DEBUG_OUT.println("Weekly start");
-  String data = collector.week_data();
-	DEBUG_OUT.println("Weekly end");
-  server.send(200, "text/html", data);
-}
-void getMonthly() {
-	DEBUG_OUT.println("Monthly start");
-  String data = collector.month_data();
-	DEBUG_OUT.println("Monthly end");
-  server.send(200, "text/html", data);
+AsyncCallbackJsonWebHandler* weekly = new AsyncCallbackJsonWebHandler("/weekly", [](AsyncWebServerRequest *request, JsonVariant &json) {
+  const JsonArray& root_array = json.as<JsonArray>();
+  JsonArray nested = root_array.createNestedArray();
+  copyArray(collector.week_in , WEEK , nested);
+  nested = root_array.createNestedArray();
+  copyArray(collector.week_out , WEEK , nested);
+});
+AsyncCallbackJsonWebHandler* monthly = new AsyncCallbackJsonWebHandler("/monthly", [](AsyncWebServerRequest *request, JsonVariant &json) {
+  const JsonArray& root_array = json.as<JsonArray>();
+  JsonArray nested = root_array.createNestedArray();
+  copyArray(collector.month_in , MONTH , nested);
+  nested = root_array.createNestedArray();
+  copyArray(collector.month_out , MONTH , nested);
+});
+
+void notFound(AsyncWebServerRequest *request) {
+    request->send(404, "text/plain", "Not found");
 }
 
 void server_setup(){
   LittleFS.begin();
-  server.on("/weekly", getWeekly);
-  server.on("/monthly", getMonthly);
+  server.addHandler(weekly);
+  server.addHandler(monthly);
 
-	server.begin();
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+    DEBUG_OUT.println("Index.html");
+    request->send(LittleFS, "/index.html", "text/html;charset=utf-8");
+  });
+  server.on("/chartist.min.css.gz", HTTP_GET, [](AsyncWebServerRequest *request){
+    DEBUG_OUT.println("/chartist.min.css.gz");
+    AsyncWebServerResponse *response = request->beginResponse(LittleFS, "/chartist.min.css.gz", "text/css;charset=utf-8");
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+  server.on("/chartist.min.js.gz", HTTP_GET, [](AsyncWebServerRequest *request){
+    DEBUG_OUT.println("/chartist.min.js.gz");
+    AsyncWebServerResponse *response = request->beginResponse(LittleFS, "/chartist.min.js.gz", "application/javascript;charset=utf-8");
+    response->addHeader("Content-Encoding", "gzip");
+    request->send(response);
+  });
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
+    DEBUG_OUT.println("/favicon.ico");
+    request->send(LittleFS, "/favicon.ico", "image/x-icon");
+  });
+
 	DEBUG_OUT.println("HTTP server started");
 
-  server.onNotFound([](){
-      if(!handleFileRead(server.uri()))
-          server.send(404, "text/plain", "FileNotFound");
-  });
+  server.onNotFound(notFound);
+
+  server.begin();
 }
 
 void server_loop() {
-	server.handleClient();
+
 }

@@ -21,27 +21,22 @@ protected:
   float minute_in = 0 ;
   float minute_out = 0 ;
 
+
+  int minute_counter = 0;
+  int week_counter = 0;
+  int month_counter = 0;
+
+  void add_month(int from ) ;
+
+public:
   float week_in[WEEK];
   float week_out[WEEK];
 
   float month_in[MONTH];
   float month_out[MONTH];
 
-  int minute_counter = 0;
-  int week_counter = 0;
-  int month_counter = 0;
-
-  String one_week( float[] );
-  String one_month( float[] );
-
-  void add_month(int from ) ;
-
-public:
-
   void add_week(float in , float out) ;
   void add(float in , float out) ;
-  String week_data();
-  String month_data();
 
 };
 

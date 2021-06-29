@@ -24,7 +24,7 @@
           console.log(this.responseText);
           var series = JSON.parse(this.responseText);
           var data = { series: series   };
-          new Chartist.Line(clazz, data);
+          new Chartist.Line(clazz, data , {high: 30 , low: -25});
         }
       }
       xhttp.open("GET", url, true);
