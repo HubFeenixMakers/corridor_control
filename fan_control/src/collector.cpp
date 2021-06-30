@@ -97,3 +97,43 @@ void Collector::add_month(int from){
   }
 }
 
+
+String Collector::one_week(float week[]){
+  String data = "[";
+  data += String(week[0] , 1) ;
+  for( int a = 1; a < WEEK ; a += 1 ) {
+    data += "," ;
+    data += String(week[a] , 1) ;
+  }
+  data += "]";
+  return data ;
+}
+
+String Collector::week_data(){
+  String data = "[";
+  data += one_week(week_in) ;
+  data += "," ;
+ // data += one_week(week_out) ;
+ // data += "]";
+  return data;
+}
+
+String Collector::one_month(float month[]){
+  String data = "[";
+  data += String(month[0] , 1);
+  for( int a = 1; a < MONTH ; a += 1 ) {
+    data += "," ;
+    data += String(month[a], 1) ;
+  }
+  data += "]";
+  return data ;
+}
+
+String Collector::month_data(){
+  String data = "[";
+  data += one_month(month_in) ;
+//  data += "," ;
+//  data += one_month(month_out) ;
+  data += "]";
+  return data ;
+}

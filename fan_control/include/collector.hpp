@@ -28,6 +28,9 @@ protected:
 
   void add_month(int from ) ;
 
+  String one_week( float[] );
+  String one_month( float[] );
+
 public:
   float week_in[WEEK];
   float week_out[WEEK];
@@ -37,6 +40,9 @@ public:
 
   void add_week(float in , float out) ;
   void add(float in , float out) ;
+
+  String week_data();
+  String month_data();
 
 };
 

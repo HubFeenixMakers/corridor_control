@@ -16,7 +16,7 @@
   <h1> Monthly </h1>
   <div class="ct-chart chart2"></div>
   <script >
-
+    var chart;
     function load_chart( url , clazz ){
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
@@ -24,7 +24,7 @@
           console.log(this.responseText);
           var series = JSON.parse(this.responseText);
           var data = { series: series   };
-          new Chartist.Line(clazz, data , {high: 30 , low: -25});
+          chart = new Chartist.Line(clazz, data , {high: 30 , low: -25});
         }
       }
       xhttp.open("GET", url, true);

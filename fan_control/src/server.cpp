@@ -2,9 +2,6 @@
 #include "collector.hpp"
 #include "serial.hpp"
 
-#include "AsyncJson.h"
-#include "ArduinoJson.h"
-
 #include <FS.h>
 
 #define DEBUG_OUT Serial
@@ -24,29 +21,35 @@ String getContentType(String filename){
 }
 
 
-AsyncCallbackJsonWebHandler* weekly = new AsyncCallbackJsonWebHandler("/weekly", [](AsyncWebServerRequest *request, JsonVariant &json) {
-  const JsonArray& root_array = json.as<JsonArray>();
-  JsonArray nested = root_array.createNestedArray();
-  copyArray(collector.week_in , WEEK , nested);
-  nested = root_array.createNestedArray();
-  copyArray(collector.week_out , WEEK , nested);
-});
-AsyncCallbackJsonWebHandler* monthly = new AsyncCallbackJsonWebHandler("/monthly", [](AsyncWebServerRequest *request, JsonVariant &json) {
-  const JsonArray& root_array = json.as<JsonArray>();
-  JsonArray nested = root_array.createNestedArray();
-  copyArray(collector.month_in , MONTH , nested);
-  nested = root_array.createNestedArray();
-  copyArray(collector.month_out , MONTH , nested);
-});
+
+// AsyncCallbackJsonWebHandler* monthly = new AsyncCallbackJsonWebHandler("/monthly");
+//  monthly.onRequest( [](AsyncWebServerRequest *request, JsonVariant &json) {
+//   const JsonArray& root_array = json.as<JsonArray>();
+//   JsonArray nested = root_array.createNestedArray();
+//   copyArray(collector.month_in , MONTH , nested);
+//   nested = root_array.createNestedArray();
+//   copyArray(collector.month_out , MONTH , nested);
+// });
 
 void notFound(AsyncWebServerRequest *request) {
-    request->send(404, "text/plain", "Not found");
+    request->send(404, "text/plain;charset=utf-8", "Not found");
 }
 
 void server_setup(){
   LittleFS.begin();
-  server.addHandler(weekly);
-  server.addHandler(monthly);
+
+  server.on("/weekly", HTTP_ANY, [](AsyncWebServerRequest * request) {
+    DEBUG_OUT.println("weekly");
+    String data = collector.week_data();
+    request->send(200, "application/json;charset=utf-8", data);
+    data.clear();
+  });
+  server.on("/monthly", HTTP_ANY, [](AsyncWebServerRequest * request) {
+    String data = collector.month_data();
+    request->send(200, "application/json;charset=utf-8", data);
+    data.clear();
+  });
+
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     DEBUG_OUT.println("Index.html");
