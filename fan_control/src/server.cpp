@@ -21,35 +21,65 @@ String getContentType(String filename){
 }
 
 
-
-// AsyncCallbackJsonWebHandler* monthly = new AsyncCallbackJsonWebHandler("/monthly");
-//  monthly.onRequest( [](AsyncWebServerRequest *request, JsonVariant &json) {
-//   const JsonArray& root_array = json.as<JsonArray>();
-//   JsonArray nested = root_array.createNestedArray();
-//   copyArray(collector.month_in , MONTH , nested);
-//   nested = root_array.createNestedArray();
-//   copyArray(collector.month_out , MONTH , nested);
-// });
-
 void notFound(AsyncWebServerRequest *request) {
     request->send(404, "text/plain;charset=utf-8", "Not found");
 }
+
+int week_counter = 0;
+int month_counter = 0;
 
 void server_setup(){
   LittleFS.begin();
 
   server.on("/weekly", HTTP_ANY, [](AsyncWebServerRequest * request) {
-    DEBUG_OUT.println("weekly");
-    String data = collector.week_data();
-    request->send(200, "application/json;charset=utf-8", data);
-    data.clear();
-  });
-  server.on("/monthly", HTTP_ANY, [](AsyncWebServerRequest * request) {
-    String data = collector.month_data();
-    request->send(200, "application/json;charset=utf-8", data);
-    data.clear();
+    DEBUG_OUT.println("weekly start");
+ 
+    AsyncWebServerResponse *response = request->beginChunkedResponse("application/json", [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
+
+      if(week_counter == 2*WEEK){ // sent all data (ret 0), reset counter 
+        week_counter = 0;
+        return 0;
+      }
+      String to_send = "";
+      if(week_counter  == 0 ) to_send = "[[";
+      else if(week_counter == WEEK) to_send = "],[";
+      else to_send += ",";
+      to_send += collector.week_data(week_counter);
+      if(week_counter == (2*WEEK - 1)) to_send += "]]";
+      week_counter++;
+      //send the data, copy to buffer
+      to_send.getBytes(buffer, maxLen); 
+      return to_send.length();
+    });
+    request->send(response);
+    DEBUG_OUT.println("weekly end");
   });
 
+  server.on("/monthly", HTTP_ANY, [](AsyncWebServerRequest * request) {
+    DEBUG_OUT.println("monthly start");
+ 
+    AsyncWebServerResponse *response = request->beginChunkedResponse("application/json", [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
+
+      if(month_counter == 2*MONTH){ // sent all data (ret 0), reset counter 
+        month_counter = 0;
+        return 0;
+      }
+      String to_send = "";
+      if(month_counter  == 0 ) to_send = "[[";
+      else if(month_counter == MONTH) to_send = "],[";
+      else to_send += ",";
+      // getting the acual data, just one point at a time (for simplicity, hope speed is ok)
+      to_send += collector.month_data(month_counter);
+      if(month_counter == (2*MONTH - 1)) to_send += "]]";
+      month_counter++;
+      //send the data, copy to buffer
+      to_send.getBytes(buffer, maxLen); 
+      return to_send.length();
+    });
+    request->send(response);
+    DEBUG_OUT.println("monthly done");
+
+  });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     DEBUG_OUT.println("Index.html");
