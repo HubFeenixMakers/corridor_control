@@ -10,7 +10,7 @@ void ota_setup(const char* ssid) {
     delay(5000);
     ESP.restart();
   }
-  DEBUG_OUT.println(WiFi.softAPIP());
+  DEBUG_OUT.println(WiFi.softAPIP().toString());
 
   // Port defaults to 3232
   //  ArduinoOTA.setPort(8266);
@@ -39,10 +39,10 @@ void ota_setup(const char* ssid) {
     DEBUG_OUT.println("\nEnd");
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    DEBUG_OUT.printf("Progress: %u%%\r", (progress / (total / 100)));
+    DEBUG_OUT.println("Progress:" +String(progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    DEBUG_OUT.printf("Error[%u]: ", error);
+    DEBUG_OUT.print("Error[" + String(error) + "]: ");
     if (error == OTA_AUTH_ERROR) DEBUG_OUT.println("Auth Failed");
     else if (error == OTA_BEGIN_ERROR) DEBUG_OUT.println("Begin Failed");
     else if (error == OTA_CONNECT_ERROR) DEBUG_OUT.println("Connect Failed");

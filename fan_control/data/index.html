@@ -34,6 +34,27 @@
       load_chart("/weekly" , ".chart1");
       load_chart("/monthly" , ".chart2");
     }
+    if (!!window.EventSource) {
+      var source = new EventSource('/events');
+
+      source.addEventListener('open', function(e) {
+        console.log("Events Connected");
+      }, false);
+
+      source.addEventListener('error', function(e) {
+        if (e.target.readyState != EventSource.OPEN) {
+          console.log("Events Disconnected");
+        }
+      }, false);
+
+      source.addEventListener('message', function(e) {
+        console.log("message", e.data);
+      }, false);
+
+      source.addEventListener('myevent', function(e) {
+        console.log("myevent", e.data);
+      }, false);
+    }
   </script>
   <script  onload="load_charts();" src="/chartist.min.js.gz"> </script>
 

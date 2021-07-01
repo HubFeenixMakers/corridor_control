@@ -9,17 +9,19 @@
 const char* ssid = "fan_XXX";
 
 void setup() {
-  DEBUG_OUT.begin(115200);
-  ota_setup(ssid);
+  Serial.begin(115200);
   server_setup();
+  serial_setup();
+  ota_setup(ssid);
   collector_setup();
   DEBUG_OUT.println(F("Setup done"));
   DEBUG_OUT.print("IP address: ");
-  DEBUG_OUT.println(WiFi.softAPIP());
+  DEBUG_OUT.println(WiFi.softAPIP().toString());
 }
 
 void loop() {
   ArduinoOTA.handle();
 	server_loop();
+	serial_loop();
   collector_loop();
 }

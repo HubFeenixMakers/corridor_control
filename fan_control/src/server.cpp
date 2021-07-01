@@ -4,7 +4,6 @@
 
 #include <FS.h>
 
-#define DEBUG_OUT Serial
 
 String getContentType(String filename){
   if(filename.indexOf(".htm") > 0) return "text/html";
@@ -105,6 +104,8 @@ void server_setup(){
 	DEBUG_OUT.println("HTTP server started");
 
   server.onNotFound(notFound);
+
+  server.addHandler(&events);
 
   server.begin();
 }
