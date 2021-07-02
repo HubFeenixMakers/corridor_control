@@ -10,9 +10,8 @@ const char* ssid = "fan_XXX";
 
 void setup() {
   Serial.begin(115200);
-  server_setup();
-  serial_setup();
   ota_setup(ssid);
+  server_setup();
   collector_setup();
   DEBUG_OUT.println(F("Setup done"));
   DEBUG_OUT.print("IP address: ");
@@ -22,6 +21,5 @@ void setup() {
 void loop() {
   ArduinoOTA.handle();
 	server_loop();
-	serial_loop();
-  collector_loop();
+	collector_loop();
 }

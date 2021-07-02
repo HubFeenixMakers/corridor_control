@@ -37,6 +37,7 @@ void server_setup(){
 
       if(week_counter == 2*WEEK){ // sent all data (ret 0), reset counter 
         week_counter = 0;
+        DEBUG_OUT.println("weekly end");
         return 0;
       }
       String to_send = "";
@@ -51,7 +52,6 @@ void server_setup(){
       return to_send.length();
     });
     request->send(response);
-    DEBUG_OUT.println("weekly end");
   });
 
   server.on("/monthly", HTTP_ANY, [](AsyncWebServerRequest * request) {
@@ -61,6 +61,7 @@ void server_setup(){
 
       if(month_counter == 2*MONTH){ // sent all data (ret 0), reset counter 
         month_counter = 0;
+        DEBUG_OUT.println("monthly done");
         return 0;
       }
       String to_send = "";
@@ -76,8 +77,18 @@ void server_setup(){
       return to_send.length();
     });
     request->send(response);
-    DEBUG_OUT.println("monthly done");
+  });
 
+  server.on("/log", HTTP_ANY, [](AsyncWebServerRequest * request) {
+    DEBUG_OUT.println("log start");
+    AsyncWebServerResponse *response = request->beginChunkedResponse("text/html", [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
+      if(debug_out.empty()) return 0;
+      String to_send = debug_out.pop();
+      to_send += "<br/>";
+      to_send.getBytes(buffer, maxLen); 
+      return to_send.length();
+    });
+    request->send(response);
   });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
