@@ -5,6 +5,8 @@
 #include <DHT.h>
 #include <DHT_U.h>
 
+WsSerial debug_out;
+
 // DHT Temperature & Humidity Sensor
 // Unified Sensor Library Example
 // Written by Tony DiCola for Adafruit Industries

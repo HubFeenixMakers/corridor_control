@@ -83,9 +83,15 @@ void server_setup(){
     DEBUG_OUT.println("log start");
     AsyncWebServerResponse *response = request->beginChunkedResponse("text/html", [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
       if(debug_out.empty()) return 0;
-      String to_send = debug_out.pop();
-      to_send += "<br/>";
-      to_send.getBytes(buffer, maxLen); 
+      String to_send = String(maxLen);
+      while(!debug_out.empty()){
+        String add_next = debug_out.first();
+        if( (add_next.length() + 5 + to_send.length() ) > maxLen ) break ; // dont overflow buffer
+        to_send.concat(add_next);
+        to_send.concat("<br/>");
+        debug_out.pop();
+      }
+      to_send.getBytes(buffer, maxLen);
       return to_send.length();
     });
     request->send(response);
@@ -115,8 +121,6 @@ void server_setup(){
 	DEBUG_OUT.println("HTTP server started");
 
   server.onNotFound(notFound);
-
-  server.addHandler(&events);
 
   server.begin();
 }

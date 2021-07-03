@@ -23,7 +23,6 @@
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          console.log(this.responseText);
           var series = JSON.parse(this.responseText);
           var data = { series: series   };
           chart = new Chartist.Line(clazz, data , {high: 30 , low: -25});
@@ -38,19 +37,17 @@
     }
     var log = document.getElementById("log")
 
-    function myCallback() {
-      function get_log( ){
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            console.log(this.responseText);
-            log.innerHTML += this.responseText;
-          }
+    function get_log( ){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log(this.responseText);
+          log.innerHTML = this.responseText + log.innerHTML;
         }
-        xhttp.open("GET", "/log", true);
-        xhttp.send();
-      };
-    }
+      }
+      xhttp.open("GET", "/log", true);
+      xhttp.send();
+    };
     var intervalID = window.setInterval(get_log, 1500);
   </script>
   <script  onload="load_charts();" src="/chartist.min.js.gz"> </script>
