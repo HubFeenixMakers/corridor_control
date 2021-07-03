@@ -83,7 +83,8 @@ void server_setup(){
     DEBUG_OUT.println("log start");
     AsyncWebServerResponse *response = request->beginChunkedResponse("text/html", [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
       if(debug_out.empty()) return 0;
-      String to_send = String(maxLen);
+      String to_send = String();
+      to_send.reserve(maxLen);
       while(!debug_out.empty()){
         String add_next = debug_out.first();
         if( (add_next.length() + 5 + to_send.length() ) > maxLen ) break ; // dont overflow buffer
