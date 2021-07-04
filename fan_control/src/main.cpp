@@ -14,8 +14,7 @@ void setup() {
   server_setup();
   collector_setup();
   DEBUG_OUT.println(F("Setup done"));
-  DEBUG_OUT.print("IP address: ");
-  DEBUG_OUT.println(WiFi.softAPIP().toString());
+  DEBUG_OUT.println(String("IP address: ") + WiFi.softAPIP().toString());
 }
 
 void loop() {

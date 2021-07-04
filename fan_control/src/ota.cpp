@@ -45,7 +45,7 @@ void ota_setup(const char* ssid) {
     DEBUG_OUT.println("Progress:" +String(progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    DEBUG_OUT.print("Error[" + String(error) + "]: ");
+    DEBUG_OUT.println("Error[" + String(error) + "]: ");
     if (error == OTA_AUTH_ERROR) DEBUG_OUT.println("Auth Failed");
     else if (error == OTA_BEGIN_ERROR) DEBUG_OUT.println("Begin Failed");
     else if (error == OTA_CONNECT_ERROR) DEBUG_OUT.println("Connect Failed");

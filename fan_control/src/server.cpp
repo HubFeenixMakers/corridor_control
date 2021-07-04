@@ -80,7 +80,6 @@ void server_setup(){
   });
 
   server.on("/log", HTTP_ANY, [](AsyncWebServerRequest * request) {
-    DEBUG_OUT.println("log start");
     AsyncWebServerResponse *response = request->beginChunkedResponse("text/html", [](uint8_t *buffer, size_t maxLen, size_t index) -> size_t {
       if(debug_out.empty()) return 0;
       String to_send = String();

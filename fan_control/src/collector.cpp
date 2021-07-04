@@ -50,10 +50,8 @@ void collector_loop(){
   // Get temperature event and print its value.
   float in = dht_in.readTemperature();
   float out = dht_out.readTemperature();
-  DEBUG_OUT.print(F("Temperature inside:  "));
-  DEBUG_OUT.println(in);
-  DEBUG_OUT.print(F("Temperature outside: "));
-  DEBUG_OUT.println(out);
+  DEBUG_OUT.println(String("Temperature inside:  ") + String(in));
+  DEBUG_OUT.println(String("Temperature outside: " + String(out)));
   collector.add(in , out);
 }
 

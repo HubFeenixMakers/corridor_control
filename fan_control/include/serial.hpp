@@ -5,7 +5,6 @@ class WsSerial{
     std::list<String> debug;
 
     public:
-    inline void print(const String& line){  println(line); }
     inline void println(const String& line){
         // enable debug the debugging 
         Serial.println(line.c_str()); 
