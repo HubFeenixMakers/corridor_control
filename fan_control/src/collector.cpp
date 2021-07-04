@@ -18,8 +18,8 @@ WsSerial debug_out;
 
 
 // mini https://chewett.co.uk/blog/1066/pin-numbering-for-wemos-d1-mini-esp8266/
-DHT dht_in(4, DHT11);  // D2 on mini
-DHT dht_out(5, DHT11); // D1 on mini
+DHT dht_in(1, DHT11);  // D2 on mini , tx, 01 on basic
+DHT dht_out(3, DHT11); // D1 on mini , rx 03 on basic
 
 Collector collector;
 

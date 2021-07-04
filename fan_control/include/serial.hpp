@@ -7,7 +7,8 @@ class WsSerial{
     public:
     inline void print(const String& line){  println(line); }
     inline void println(const String& line){
-        // enable debug the debugging Serial.println(line.c_str()); 
+        // enable debug the debugging 
+        Serial.println(line.c_str()); 
         if(debug.size() > 100 ) debug.pop_back();
         debug.push_front(line); 
         }
@@ -16,6 +17,7 @@ class WsSerial{
     inline const String& first(){ return debug.front();};
     inline void pop(){ return debug.pop_front();};
     inline bool empty(){ return debug.empty();};
+    inline void clear(){ debug.clear();}
 };
 
 extern WsSerial debug_out;
