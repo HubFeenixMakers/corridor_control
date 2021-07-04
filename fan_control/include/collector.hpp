@@ -21,12 +21,12 @@ protected:
   float minute_in = 0 ;
   float minute_out = 0 ;
 
-
   int minute_counter = 0;
   int week_counter = 0;
   int month_counter = 0;
 
   void add_month(int from ) ;
+  void switch_logic(float in , float out);
 
 public:
   float week_in[WEEK];

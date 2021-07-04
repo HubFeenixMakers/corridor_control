@@ -21,6 +21,8 @@ WsSerial debug_out;
 DHT dht_in(1, DHT11);  // D2 on mini , tx, 01 on basic
 DHT dht_out(3, DHT11); // D1 on mini , rx 03 on basic
 
+#define RELAY 12  // the relay pin
+
 Collector collector;
 
 float next_rand( float old ){
@@ -57,8 +59,8 @@ void collector_loop(){
 
 void Collector::add(float in , float out)
 {
-  if(isnan(in) ) return ;  
-  if(isnan(out) ) return ;  
+  if(isnan(in) ) return ;
+  if(isnan(out) ) return ;
   minute_in += in;
   minute_out += out;
   minute_counter++ ;
@@ -70,7 +72,22 @@ void Collector::add(float in , float out)
   }
 }
 
+void Collector::switch_logic(float in , float out){
+  u_int8_t on;
+  String msg;
+  if(in < out){
+    on = 1 ;
+    msg = "Switching on";
+  }else{
+    on = 0 ;
+    msg = "Switching off";
+  }
+  digitalWrite( RELAY , on);
+  DEBUG_OUT.println(msg);  
+}
+
 void Collector::add_week(float in , float out){
+  switch_logic(in , out);
   week_in[week_counter] = in;
   week_out[week_counter] = out;
   if((week_counter % PER_HOUR) == 0){
