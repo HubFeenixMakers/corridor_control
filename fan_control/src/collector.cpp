@@ -43,6 +43,7 @@ void collector_setup(){
     last_in = next_rand(last_in);
     last_out = next_rand(last_out);
   }
+  collector.start();
 }
 
 void collector_loop(){
@@ -70,18 +71,23 @@ void Collector::add(float in , float out)
   }
 }
 
+void Collector::start(){
+  started = true;
+  week_counter = 0;
+  month_counter = 0;
+}
+
 void Collector::switch_logic(float in , float out){
-  u_int8_t on;
-  String msg;
-  if(in < out){
-    on = 1 ;
-    msg = "Switching on";
-  }else{
-    on = 0 ;
-    msg = "Switching off";
+  if( !started ) return ;
+  if(out > (in + 1.0) ){
+    digitalWrite( RELAY , 1);
+    DEBUG_OUT.println("Switching on");  
+  }else if( in > (out - 0.5 ) ) {
+    digitalWrite( RELAY , 0);
+    DEBUG_OUT.println( "Switching off" );
+  } else {
+    DEBUG_OUT.println( "No Switching" );
   }
-  digitalWrite( RELAY , on);
-  DEBUG_OUT.println(msg);  
 }
 
 void Collector::add_week(float in , float out){

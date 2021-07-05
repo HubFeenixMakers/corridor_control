@@ -25,6 +25,8 @@ protected:
   int week_counter = 0;
   int month_counter = 0;
 
+  boolean started = false;
+  
   void add_month(int from ) ;
   void switch_logic(float in , float out);
 
@@ -37,6 +39,7 @@ public:
 
   void add_week(float in , float out) ;
   void add(float in , float out) ;
+  void start(); // fake data before, no switching
 
   String week_data( int at);
   String month_data(int at);
