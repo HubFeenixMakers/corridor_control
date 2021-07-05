@@ -5,18 +5,30 @@
     <link rel="stylesheet" href="chartist.min.css.gz">
     <style>
         .ct-chart{
-            width: 90%;
+            width: 100%;
             height: 300px;
+        }
+        .left{
+          float: left;
+          width: 80%;
+        }
+        .right{
+          float: left;
+          width: 19%;
         }
     </style>
 </head>
 <body>
-  <h1> Weekly </h1>
-  <div class="ct-chart chart1"></div>
-  <h1> Monthly </h1>
-  <div class="ct-chart chart2"></div>
-  <h1> Log </h1>
-  <div id="log"></div>
+  <div class="left">
+    <h1> Weekly </h1>
+    <div class="ct-chart chart1"></div>
+    <h1> Monthly </h1>
+    <div class="ct-chart chart2"></div>
+  </div>
+  <div class="right">
+    <h1> Log </h1>
+    <div id="log"></div>
+  </div>
   <script >
     var chart;
     function load_chart( url , clazz ){
