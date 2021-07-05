@@ -2,8 +2,12 @@
 #include "serial.hpp"
 #include <LittleFS.h>
 
-void ota_setup(const char* ssid) {
+static String ssid;
 
+void ota_setup() {
+  String mac = WiFi.macAddress();
+  mac.replace(":","_");
+  ssid = String("fan_") + mac;
   DEBUG_OUT.println("Booting");
   boolean result = WiFi.softAP(ssid);
   while (result == false) {

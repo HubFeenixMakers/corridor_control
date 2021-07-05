@@ -4,4 +4,4 @@
 #include <ESP8266mDNS.h>
 #include <ArduinoOTA.h>
 
-void ota_setup(const char* name);
+void ota_setup();

@@ -6,11 +6,10 @@
 #include "serial.hpp"
 
 
-const char* ssid = "fan_XXX";
 
 void setup() {
   Serial.begin(115200);
-  ota_setup(ssid);
+  ota_setup();
   server_setup();
   collector_setup();
   DEBUG_OUT.println(F("Setup done"));
