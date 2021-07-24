@@ -21,14 +21,14 @@ WsSerial debug_out;
 DHT dht_in(1, DHT11);  // D2 on mini , tx, 01 on basic
 DHT dht_out(3, DHT11); // D1 on mini , rx 03 on basic
 
-#define RELAY 12  // the relay pin
-
 Collector collector;
+float min_ran = 10;
+float max_ran = 30;
 
 float next_rand( float old ){
-  float f =  old + random(-30 , 30) / 100.0 ;
-  if( f > 30.0) f = 30.0 ;
-  if( f < -20.0) f = -20.0 ;
+  float f =  old + random(-10 , 10) / 100.0 ;
+  if( f > max_ran) f = max_ran ;
+  if( f < min_ran) f = min_ran ;
   return f;
 }
 
@@ -43,6 +43,8 @@ void collector_setup(){
     last_in = next_rand(last_in);
     last_out = next_rand(last_out);
   }
+  pinMode(RELAY_BUILTIN , OUTPUT);
+  digitalWrite( RELAY_BUILTIN , LOW);
   collector.start();
 }
 
@@ -51,13 +53,12 @@ void collector_loop(){
   // Get temperature event and print its value.
   float in = dht_in.readTemperature();
   float out = dht_out.readTemperature();
-  DEBUG_OUT.println(String("Temperature inside:  ") + String(in));
-  DEBUG_OUT.println(String("Temperature outside: " + String(out)));
   collector.add(in , out);
 }
 
 void Collector::add(float in , float out)
 {
+  DEBUG_OUT.println(String("Temp. in/out (" ) + String(MINUTE - minute_counter) + "):" + String(in)  +  " / " + String(out));
   if(isnan(in) ) return ;
   if(isnan(out) ) return ;
   minute_in += in;
@@ -80,10 +81,10 @@ void Collector::start(){
 void Collector::switch_logic(float in , float out){
   if( !started ) return ;
   if(out > (in + 1.0) ){
-    digitalWrite( RELAY , 1);
-    DEBUG_OUT.println("Switching on");  
+    digitalWrite( RELAY_BUILTIN , HIGH);
+    DEBUG_OUT.println("Switching on" );  
   }else if( in > (out - 0.5 ) ) {
-    digitalWrite( RELAY , 0);
+    digitalWrite( RELAY_BUILTIN , LOW);
     DEBUG_OUT.println( "Switching off" );
   } else {
     DEBUG_OUT.println( "No Switching" );
