@@ -4,7 +4,7 @@
 
 #include <FS.h>
 
-static String FAN_VERSION = "1.0.1" ;
+static String FAN_VERSION = "1.0.2" ;
 
 String getContentType(String filename){
   if(filename.indexOf(".htm") > 0) return "text/html";

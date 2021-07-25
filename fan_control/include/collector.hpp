@@ -25,6 +25,8 @@ protected:
   int week_counter = 0;
   int month_counter = 0;
 
+  int max_week = 0;
+  int max_month = 0;
   
   void add_month(int from ) ;
   void switch_logic(float in , float out);

@@ -61,6 +61,20 @@ void Collector::add(float in , float out)
   }
 }
 
+void Collector::add_week(float in , float out){
+  switch_logic(in , out);
+  week_in[week_counter] = in;
+  week_out[week_counter] = out;
+  if((week_counter % PER_HOUR) == 0){
+    add_month( week_counter - PER_HOUR);
+  }
+  if(week_counter > max_week) max_week = week_counter ;
+  week_counter++ ;
+  if(week_counter >= WEEK) {
+    week_counter = 0;
+  }
+}
+
 void Collector::switch_logic(float in , float out){
   if(out > (in + 1.0) ){
     digitalWrite( RELAY_BUILTIN , HIGH);
@@ -70,19 +84,6 @@ void Collector::switch_logic(float in , float out){
     DEBUG_OUT.println( "Switching off" );
   } else {
     DEBUG_OUT.println( "No Switching" );
-  }
-}
-
-void Collector::add_week(float in , float out){
-  switch_logic(in , out);
-  week_in[week_counter] = in;
-  week_out[week_counter] = out;
-  if((week_counter % PER_HOUR) == 0){
-    add_month( week_counter - PER_HOUR);
-  }
-  week_counter++ ;
-  if(week_counter >= WEEK) {
-    week_counter = 0;
   }
 }
 
@@ -97,6 +98,7 @@ void Collector::add_month(int from){
   }
   month_in[month_counter] = month_i / PER_HOUR;
   month_out[month_counter] = month_o / PER_HOUR ;
+  if( month_counter > max_month) max_month = month_counter ;
   month_counter++ ;
   if(month_counter >= MONTH) {
     month_counter = 0;
@@ -106,17 +108,21 @@ void Collector::add_month(int from){
 
 String Collector::week_data(int at){
   if( at < WEEK){
+    if( at > max_week ) at = max_week;
     return String(week_in[at] , 2) ;
   }else{
-    return String(week_out[at - WEEK] , 2) ;
+  if( at > (max_week + WEEK) ) at = max_week + WEEK;
+  return String(week_out[at - WEEK] , 2) ;
   }
 }
 
 
 String Collector::month_data(int at){
   if( at < MONTH){
+    if(at > max_month) at = max_month ;
     return String(month_in[at] , 2) ;
   }else{
+    if(at > (max_month + MONTH)) at = max_month + MONTH ;
     return String(month_out[at - MONTH] , 2) ;
   }
 }
