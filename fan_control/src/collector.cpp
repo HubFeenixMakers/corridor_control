@@ -22,30 +22,19 @@ DHT dht_in(1, DHT11);  // D2 on mini , tx, 01 on basic
 DHT dht_out(3, DHT11); // D1 on mini , rx 03 on basic
 
 Collector collector;
-float min_ran = 10;
-float max_ran = 30;
-
-float next_rand( float old ){
-  float f =  old + random(-10 , 10) / 100.0 ;
-  if( f > max_ran) f = max_ran ;
-  if( f < min_ran) f = min_ran ;
-  return f;
-}
 
 void collector_setup(){
   // Initialize device.
   dht_in.begin();
   dht_out.begin();
-  float last_in = 20;
-  float last_out = 20;
-  for( int a = 0; a < PER_HOUR*WEEK ; a += 1 ) {
-    collector.add_week( last_in , last_out  );
-    last_in = next_rand(last_in);
-    last_out = next_rand(last_out);
-  }
   pinMode(RELAY_BUILTIN , OUTPUT);
   digitalWrite( RELAY_BUILTIN , LOW);
   collector.start();
+}
+
+void Collector::start(){
+  week_counter = 0;
+  month_counter = 0;
 }
 
 void collector_loop(){
@@ -72,14 +61,7 @@ void Collector::add(float in , float out)
   }
 }
 
-void Collector::start(){
-  started = true;
-  week_counter = 0;
-  month_counter = 0;
-}
-
 void Collector::switch_logic(float in , float out){
-  if( !started ) return ;
   if(out > (in + 1.0) ){
     digitalWrite( RELAY_BUILTIN , HIGH);
     DEBUG_OUT.println("Switching on" );  
