@@ -4,6 +4,7 @@
 
 #include <FS.h>
 
+static String FAN_VERSION = "1.0.1" ;
 
 String getContentType(String filename){
   if(filename.indexOf(".htm") > 0) return "text/html";
@@ -98,7 +99,7 @@ void server_setup(){
   });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    DEBUG_OUT.println("Index.html");
+    DEBUG_OUT.println("Index.html "  + FAN_VERSION);
     request->send(LittleFS, "/index.html", "text/html;charset=utf-8");
   });
   server.on("/chartist.min.css.gz", HTTP_GET, [](AsyncWebServerRequest *request){
